@@ -52,7 +52,7 @@ class Player {
         readonly int id;
 
         // The Opportunist strives to stay alive next turn, but if it can can
-        // acomplish it while eating food, it will do so.
+        // accomplish it while eating food, it will do so.
         public Opportunist(int width, int height, int id) {
             this.id = id;
             random = new Random(42);

@@ -46,10 +46,14 @@ class Player
             //Console.WriteLine("E");
         }
     }
+
     class BlindAndForgetfull {
         readonly Random random;
         readonly Dictionary<string, string[]> legalStates;
         string prev;
+
+        // BlindAndForgetfull will not kill itself with itself, 
+        // but all other options are on the table.
         public BlindAndForgetfull() {
             random = new Random(42);
             prev = "W";

@@ -67,6 +67,8 @@ class Player
 
         string prev;
 
+        // TheAnimal walks randomly and will not kill itself on itself or go out of bounds,
+        // all other actions are exiting possibilities.
         public TheAnimal(int width, int height) {
             this.width = width;
             this.height = height;

@@ -19,11 +19,12 @@ class Player {
         int foodcount = int.Parse(inputs[3]);
         int myid = int.Parse(inputs[4]);
 
-        var bot = new Cautious(width, height, myid);
+        var bot = new Opportunist(width, height, myid);
 
         // game loop
         while (true) {
             var snakes = new string[playercount];
+            var food = new string[foodcount];
             int aliveplayers = int.Parse(Console.ReadLine());
             for (int i = 0; i < aliveplayers; i++) {
                 inputs = Console.ReadLine().Split(' ');
@@ -38,35 +39,47 @@ class Player {
                 inputs = Console.ReadLine().Split(' ');
                 int x = int.Parse(inputs[0]);
                 int y = int.Parse(inputs[1]);
+                food[i] = $"{x},{y}";
             }
 
-            bot.MoveSnake(snakes);
+            bot.MoveSnake(snakes, food);
         }
     }
 
-    class Cautious {
+    class Opportunist {
         readonly Random random;
         readonly Position[] walls;
         readonly int id;
 
-        // Cautious lives only to stay alive next turn.
-        public Cautious(int width, int height, int id) {
+        // The Opportunist strives to stay alive next turn, but if it can can
+        // acomplish it while eating food, it will do so.
+        public Opportunist(int width, int height, int id) {
             this.id = id;
             random = new Random(42);
             walls = GenerateWalls(width, height);
         }
 
-        public void MoveSnake(string[] snakes) {
+        public void MoveSnake(string[] snakes, string[] food) {
             var me = ParsePositions(snakes[id]);
             Console.Error.WriteLine("Me: " + string.Join(',', me.Select(p => p.ToString())));
             
             var dangers = snakes.Where(s => s != null).SelectMany(s => ParsePositions(s)).Concat(walls).ToArray();
             Console.Error.WriteLine("Dangers: " + string.Join('|', dangers.Select(p => p.ToString())));
+
+            var treats = food.SelectMany(s => ParsePositions(s)).ToArray();
+            Console.Error.WriteLine("Food: " + string.Join('|', treats.Select(p => p.ToString())));
             
             var potentialMoves = GenerateValidMoves(me[0], dangers);
             Console.Error.WriteLine(string.Join('|', potentialMoves.Select(p => p.ToString())));
-            var choice = random.Next(0, potentialMoves.Length);
-            Console.WriteLine(potentialMoves[choice].Direction);
+            var foodEatingMove = potentialMoves.FirstOrDefault(m => treats.Any(f => m.NewPosition.Equals(f)));
+
+            Console.Error.WriteLine("Foodeating: " + foodEatingMove.Direction);
+            if (!string.IsNullOrEmpty(foodEatingMove.Direction)) {
+                Console.WriteLine(foodEatingMove.Direction);    
+            } else {
+                var choice = random.Next(0, potentialMoves.Length);
+                Console.WriteLine(potentialMoves[choice].Direction);
+            }
         }
 
         Move[] GenerateValidMoves(Position head, Position[] dangers) {
